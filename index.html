@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuranMuslim</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<header class="header">
+  <h1>QuranMuslim</h1>
+  <div>
+    <button id="backBtn" class="hidden">←</button>
+    <button id="themeToggle">☀️</button>
+  </div>
+</header>
+
+<div class="search-box">
+  <input type="text" id="search" placeholder="Cari surah..." />
+</div>
+
+<nav class="nav">
+  <a href="https://quran.nu.or.id">📖</a>
+  <a href="https://quran.nu.or.id/tahlil">🤲</a>
+  <a href="https://quran.nu.or.id/doa">🕌</a>
+  <a href="https://quran.nu.or.id/maulid">🌙</a>
+</nav>
+
+<section class="shortcut">
+  <button onclick="openSurah(36)">Yasin</button>
+  <button onclick="openSurah(56)">Al-Waqi'ah</button>
+  <button onclick="openSurah(67)">Al-Mulk</button>
+  <button onclick="openSurah(18)">Al-Kahfi</button>
+  <button onclick="openSurah(55)">Ar-Rahman</button>
+</section>
+
+<main>
+  <section id="surahList"></section>
+  <section id="ayatDetail" class="hidden"></section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
