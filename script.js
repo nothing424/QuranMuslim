@@ -72,7 +72,15 @@ async function openSurah(n) {
     detail.appendChild(el);
   });
 }
-
+// efek klik halus
+document.addEventListener("click", e => {
+  if (e.target.closest("#surahList div")) {
+    e.target.closest("#surahList div").style.transform = "scale(0.97)";
+    setTimeout(() => {
+      e.target.closest("#surahList div").style.transform = "scale(1)";
+    }, 100);
+  }
+});
 // AUDIO SYSTEM
 function playSurahFull(verses, name) {
   playlist = verses.map(v => v.audio.primary);
