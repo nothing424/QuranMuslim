@@ -1,9 +1,14 @@
 const list = document.getElementById("surahList");
 const detail = document.getElementById("ayatDetail");
 const search = document.getElementById("search");
-const backBtn = document.getElementById("backBtn");
 
 let allSurah = [];
+
+// AUDIO SYSTEM
+let audio = new Audio();
+let playlist = [];
+let currentIndex = 0;
+let currentSurah = "";
 
 // LOAD SURAH
 async function loadSurah() {
@@ -19,12 +24,10 @@ function renderSurah(data) {
 
   data.forEach(s => {
     const el = document.createElement("div");
-
     el.innerHTML = `
       <span>${s.number}. ${s.name.transliteration.id}</span>
       <span>${s.name.short}</span>
     `;
-
     el.onclick = () => openSurah(s.number);
     list.appendChild(el);
   });
@@ -33,66 +36,95 @@ function renderSurah(data) {
 // SEARCH
 search.oninput = () => {
   const value = search.value.toLowerCase();
-
-  const filtered = allSurah.filter(s =>
+  renderSurah(allSurah.filter(s =>
     s.name.transliteration.id.toLowerCase().includes(value)
-  );
-
-  renderSurah(filtered);
+  ));
 };
 
 // OPEN SURAH
 async function openSurah(n) {
+  window.scrollTo({ top: 0 });
+
   list.classList.add("hidden");
   detail.classList.remove("hidden");
-  backBtn.classList.remove("hidden");
 
   const res = await fetch(`https://api.quran.gading.dev/surah/${n}`);
   const json = await res.json();
 
   detail.innerHTML = "";
 
-  json.data.verses.forEach((v, i) => {
+  // PLAY BUTTON
+  const btn = document.createElement("button");
+  btn.textContent = "▶ Play Full Surah";
+  btn.onclick = () => playSurahFull(json.data.verses, json.data.name.transliteration.id);
+  detail.appendChild(btn);
+
+  json.data.verses.forEach(v => {
     const el = document.createElement("div");
     el.className = "ayat";
-
-    const audio = new Audio(v.audio.primary);
 
     el.innerHTML = `
       <div class="arab">${v.text.arab}</div>
       <div class="latin">${v.text.transliteration.en}</div>
       <div>${v.translation.id}</div>
-      <button>▶</button>
     `;
-
-    const btn = el.querySelector("button");
-
-    btn.onclick = () => {
-      audio.play();
-
-      audio.onended = () => {
-        const next = detail.children[i + 1];
-        if (next) next.querySelector("button").click();
-      };
-    };
 
     detail.appendChild(el);
   });
 }
 
-// BACK
-backBtn.onclick = () => {
-  detail.classList.add("hidden");
-  list.classList.remove("hidden");
-  backBtn.classList.add("hidden");
-};
+// AUDIO SYSTEM
+function playSurahFull(verses, name) {
+  playlist = verses.map(v => v.audio.primary);
+  currentIndex = 0;
+  currentSurah = name;
+
+  document.getElementById("miniPlayer").classList.remove("hidden");
+  playTrack();
+}
+
+function playTrack() {
+  if (currentIndex >= playlist.length) return;
+
+  audio.src = playlist[currentIndex];
+  audio.play();
+
+  document.getElementById("trackTitle").textContent = currentSurah;
+  document.getElementById("trackAyat").textContent = "Ayat " + (currentIndex + 1);
+
+  audio.onended = () => {
+    currentIndex++;
+    playTrack();
+  };
+}
+
+function togglePlay() {
+  audio.paused ? audio.play() : audio.pause();
+}
+
+function nextTrack() {
+  currentIndex++;
+  playTrack();
+}
+
+function prevTrack() {
+  currentIndex--;
+  playTrack();
+}
 
 // DARK MODE
-const toggle = document.getElementById("themeToggle");
-
-toggle.onclick = () => {
+document.getElementById("themeToggle").onclick = () => {
   document.body.classList.toggle("dark");
-  toggle.textContent = document.body.classList.contains("dark") ? "🌙" : "☀️";
 };
+
+// FOCUS MODE
+document.getElementById("focusBtn").onclick = () => {
+  document.body.classList.toggle("focus");
+};
+
+// SERVICE WORKER
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 
 loadSurah();
