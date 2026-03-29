@@ -4,15 +4,11 @@
 
 # QuranMuslim
 
-Aplikasi Quran modern, minimalis, dan nyaman dibaca.
+Aplikasi Quran modern dengan audio & mode fokus.
 
 ## Fitur
-- Daftar Surah
-- Ayat lengkap (Arab, Latin, Arti)
-- Audio per ayat
-- Auto next ayat
+- Audio full surah
+- Background play
+- Mode fokus
 - Dark mode
-- Search surah
-
-## API
-https://api.quran.gading.dev
+- Offline basic
