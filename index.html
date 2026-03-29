@@ -17,34 +17,38 @@
 <header class="header">
   <h1>QuranMuslim</h1>
   <div>
-    <button id="backBtn" class="hidden">←</button>
+    <button id="focusBtn">🧘</button>
     <button id="themeToggle">☀️</button>
   </div>
 </header>
+
+<section class="hero">
+  <h2>Baca Al-Quran dengan Tenang</h2>
+  <p>Pengalaman membaca yang bersih & nyaman</p>
+</section>
 
 <div class="search-box">
   <input type="text" id="search" placeholder="Cari surah..." />
 </div>
 
-<nav class="nav">
-  <a href="https://quran.nu.or.id">📖</a>
-  <a href="https://quran.nu.or.id/tahlil">🤲</a>
-  <a href="https://quran.nu.or.id/doa">🕌</a>
-  <a href="https://quran.nu.or.id/maulid">🌙</a>
-</nav>
-
-<section class="shortcut">
-  <button onclick="openSurah(36)">Yasin</button>
-  <button onclick="openSurah(56)">Al-Waqi'ah</button>
-  <button onclick="openSurah(67)">Al-Mulk</button>
-  <button onclick="openSurah(18)">Al-Kahfi</button>
-  <button onclick="openSurah(55)">Ar-Rahman</button>
-</section>
-
 <main>
   <section id="surahList"></section>
   <section id="ayatDetail" class="hidden"></section>
 </main>
+
+<!-- MINI PLAYER -->
+<div id="miniPlayer" class="mini-player hidden">
+  <div>
+    <span id="trackTitle">-</span><br>
+    <small id="trackAyat">-</small>
+  </div>
+
+  <div>
+    <button onclick="prevTrack()">⏮</button>
+    <button onclick="togglePlay()">▶</button>
+    <button onclick="nextTrack()">⏭</button>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
