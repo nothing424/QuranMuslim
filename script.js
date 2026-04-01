@@ -19,15 +19,26 @@ async function loadSurah() {
   renderSurah(allSurah);
 }
 
+// RENDER SURAH
 function renderSurah(data) {
   list.innerHTML = "";
 
   data.forEach(s => {
     const el = document.createElement("div");
+    el.className = "surah-item";
+
     el.innerHTML = `
-      <span>${s.number}. ${s.name.transliteration.id}</span>
-      <span>${s.name.short}</span>
+      <div class="surah-left">
+        <span class="surah-number">${s.number}</span>
+        <div>
+          <div class="surah-name">${s.name.transliteration.id}</div>
+          <div class="surah-meaning">${s.name.translation.id}</div>
+        </div>
+      </div>
+
+      <div class="surah-arab">${s.name.short}</div>
     `;
+
     el.onclick = () => openSurah(s.number);
     list.appendChild(el);
   });
@@ -50,47 +61,74 @@ async function openSurah(n) {
 
   const res = await fetch(`https://api.quran.gading.dev/surah/${n}`);
   const json = await res.json();
+  const surah = json.data;
 
   detail.innerHTML = "";
 
-  // PLAY BUTTON
-  const btn = document.createElement("button");
-  btn.textContent = "▶ Play Full Surah";
-  btn.onclick = () => playSurahFull(json.data.verses, json.data.name.transliteration.id);
-  detail.appendChild(btn);
+  // 🔙 BACK BUTTON
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "← Kembali";
+  backBtn.onclick = () => {
+    detail.classList.add("hidden");
+    list.classList.remove("hidden");
+    audio.pause();
+  };
+  detail.appendChild(backBtn);
 
-  json.data.verses.forEach(v => {
+  // ▶ PLAY FULL
+  const playBtn = document.createElement("button");
+  playBtn.textContent = "▶ Play Full Surah";
+  playBtn.onclick = () => playSurahFull(surah.verses, surah.name.transliteration.id);
+  detail.appendChild(playBtn);
+
+  // 🕌 BISMILLAH (kecuali At-Taubah)
+  if (n !== 9) {
+    const bismillah = document.createElement("div");
+    bismillah.className = "bismillah";
+    bismillah.innerHTML = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
+    detail.appendChild(bismillah);
+  }
+
+  // 📖 AYAT
+  surah.verses.forEach(v => {
     const el = document.createElement("div");
     el.className = "ayat";
 
     el.innerHTML = `
-      <div class="arab">${v.text.arab}</div>
+      <div class="arab">
+        ${v.text.arab}
+        <span class="nomor">${v.number.inSurah}</span>
+      </div>
       <div class="latin">${v.text.transliteration.en}</div>
-      <div>${v.translation.id}</div>
+      <div class="arti">${v.translation.id}</div>
     `;
+
+    // 🔊 AUDIO PER AYAT
+    el.onclick = () => {
+      audio.src = v.audio.primary;
+      audio.play();
+
+      document.getElementById("miniPlayer").classList.remove("hidden");
+      document.getElementById("trackTitle").textContent = currentSurah;
+      document.getElementById("trackAyat").textContent = "Ayat " + v.number.inSurah;
+    };
 
     detail.appendChild(el);
   });
 }
-// efek klik halus
-document.addEventListener("click", e => {
-  if (e.target.closest("#surahList div")) {
-    e.target.closest("#surahList div").style.transform = "scale(0.97)";
-    setTimeout(() => {
-      e.target.closest("#surahList div").style.transform = "scale(1)";
-    }, 100);
-  }
-});
-// AUDIO SYSTEM
+
+// AUDIO FULL SURAH
 function playSurahFull(verses, name) {
   playlist = verses.map(v => v.audio.primary);
   currentIndex = 0;
   currentSurah = name;
 
   document.getElementById("miniPlayer").classList.remove("hidden");
+
   playTrack();
 }
 
+// PLAY TRACK
 function playTrack() {
   if (currentIndex >= playlist.length) return;
 
@@ -106,6 +144,7 @@ function playTrack() {
   };
 }
 
+// CONTROL
 function togglePlay() {
   audio.paused ? audio.play() : audio.pause();
 }
@@ -130,9 +169,21 @@ document.getElementById("focusBtn").onclick = () => {
   document.body.classList.toggle("focus");
 };
 
+// EFEK KLIK HALUS
+document.addEventListener("click", e => {
+  if (e.target.closest(".surah-item")) {
+    const el = e.target.closest(".surah-item");
+    el.style.transform = "scale(0.97)";
+    setTimeout(() => {
+      el.style.transform = "scale(1)";
+    }, 100);
+  }
+});
+
 // SERVICE WORKER
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 
+// INIT
 loadSurah();
